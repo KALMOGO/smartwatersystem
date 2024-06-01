@@ -1,9 +1,6 @@
-# smartwatersystem
+#SMARTER WATER SYSTEM  API:
 
-#SMARTER WATER SYSTEM:
+## -Water Quality Real Time monitoring
+## - Water Parameters monitoring
 
-# -Water Quality Real Time monitoring
-
-# - Water Parameters monitoring
-
-#### IoT & IA 
+### IoT & IA 

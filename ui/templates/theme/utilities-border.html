@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} Utilities (Borders) {% endblock %}
+
+
+{% block js_head %}
+
+<link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap5.min.css">
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.print.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+{% endblock %}
+
+{% block css %}
+    <!-- Custom CSS -->
+<style>
+    /* Add custom styles for the DataTable */
+    table.dataTable thead {
+        background-color: rgba(0, 0, 0, 0.9);
+        color: white;
+    }
+    table.dataTable tbody tr:nth-child(odd) {
+        background-color: #f9f9f9;
+        font-weight:bold;
+    }
+    table.dataTable tbody tr:nth-child(even) {
+        background-color: #e9ecef;
+        font-weight:bold;
+    }
+    table.dataTable tbody tr:hover {
+        background-color: #d6d6d6;
+        
+    }
+    table.dataTable {
+        width: 100%;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        background-color: #0056b3;
+        color: white !important;
+        border: none;
+        border-radius: 4px;
+        margin: 0 2px;
+        font-weight:bold;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background-color: #0056b3;
+        color: white !important;
+        font-weight:bold;
+    }
+</style>
+{% endblock %}
+
+
+{% block container_fluid %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <h1 class="h3 mb-1 text-gray-800">HISTORIQUE DES PREDICTIONS</h1>
+    <!-- Content Row -->
+    <p style="margin-top:30px"></p>
+    
+    <table id="myTable" class="display">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Parametres</th>
+                <th>Date de debut</th>
+                <th>Date de fin</th>
+                <th>Site</th>
+                <th>Date de création</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for param in params %}
+                <tr>
+                    <td>{{forloop.counter}}</td>
+                    <td>{{param.parameter}}</td>
+                    <td>{{param.lower_border}}</td>
+                    <td>{{param.upper_border}}</td>
+                    <td>{{param.data_source}}</td>
+                    <td>{{param.created_at}}</td>
+                </tr>
+            {% endfor %}
+                
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+
+{% block js_body %}
+    {% comment %} Identité de l'utilisateur  {% endcomment %}
+    <script>
+        let user = localStorage.getItem('userConnected') ? JSON.parse(localStorage.getItem('userConnected')) : '';
+        let connected_user = document.getElementById("connected_user");
+        let imgProfil = document.getElementById("img-profile");
+
+        connected_user.innerText = ""+ user.name;
+        imgProfil.src = user.photo ? user.photo :  "https://source.unsplash.com/QAB-WJcbgJk/60x60";
+    </script>
+    {% comment %} <script src="{% static 'js/datable.js' %}"></script> {% endcomment %}
+    <script>
+        let table = new DataTable('#myTable',  {
+            language: {
+                "sEmptyTable":     "Aucune donnée disponible dans le tableau",
+                "sInfo":           "Affichage de l'élément _START_ à _END_ sur _TOTAL_ éléments",
+                "sInfoEmpty":      "Affichage de l'élément 0 à 0 sur 0 élément",
+                "sInfoFiltered":   "(filtré à partir de _MAX_ éléments au total)",
+                "sInfoPostFix":    "",
+                "sInfoThousands":  ",",
+                "sLengthMenu":     "Afficher _MENU_ éléments",
+                "sLoadingRecords": "Chargement...",
+                "sProcessing":     "Traitement...",
+                "sSearch":         "Rechercher :",
+                "sZeroRecords":    "Aucun élément correspondant trouvé",
+                "oPaginate": {
+                  "sFirst":    "Premier",
+                  "sLast":     "Dernier",
+                  "sNext":     "Suivant",
+                  "sPrevious": "Précédent"
+                },
+                "oAria": {
+                  "sSortAscending":  ": activer pour trier la colonne par ordre croissant",
+                  "sSortDescending": ": activer pour trier la colonne par ordre décroissant"
+                }
+            },
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'csv', 'excel'
+            ],
+            paging: true,
+            searching: true,
+            info: true,
+            lengthChange: true
+        });
+    </script> 
+{% endblock %}

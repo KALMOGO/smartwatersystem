@@ -1,0 +1,507 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} Index {% endblock %}
+
+{% block container_fluid %}
+
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">User dashbord</h1>
+        <a href="#" class="d-Aucunes données d-sm-inline-block btn btn-sm btn-primary shadow-sm"
+            data-toggle="modal" data-target="#parameterModal">
+            <i class="fa fa-wrench" aria-hidden="true"></i>
+            parameter display
+        </a>
+    </div>
+    <!-- Content Row -->
+    <div class="row">
+        <!-- Earnings (Monthly) Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Temperature</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800 error mx-auto" id="tempBox"
+                                data-text="" style="font-size:18px">Not selected</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fa fa-tint" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">PH</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800 error mx-auto" id="phBox" data-text="" style="font-size:18px">
+                                Not selected</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fa fa-tint" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Earnings (Monthly) Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">OD</div>
+                            <div class="row no-gutters align-items-center">
+                                <div class="col-auto">
+                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800  error mx-auto" id="odBox" data-text="Aucunes données" style="font-size:18px">No data</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fa fa-tint" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Pending Requests Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Turbidity</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800 error mx-auto" id="odTurbidy" data-text="Aucunes données" style="font-size:18px">No data</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fa fa-tint" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Row -->
+    <div class="row">
+        <!-- Area Chart -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary" id="idCartMessage"></h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="myAreaChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pie Chart -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Water quality</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                    
+                    </div>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="chart-pie p-10 d-flex justify-content-center align-items-center">
+                        <!-- This content will be dynamically updated by JavaScript -->
+                        <a href="#" class="btn btn-success btn-lg" style="width:10rem; height:10rem; border-radius: 5.3rem;"></a>
+                    </div>
+                    
+
+                    <div class="mt-4 text-center small small-quality-message">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js_body %}
+	{% include 'theme/components/charts_scripts.html' %}
+
+    {% comment %} Info sur l'utilisateur connecter {% endcomment %}
+    <script>
+        let user = localStorage.getItem('userConnected') ? JSON.parse(localStorage.getItem('userConnected')) : '';
+        let connected_user = document.getElementById("connected_user");
+        let imgProfil = document.getElementById("img-profile");
+
+        connected_user.innerText = ""+ user.name;
+        imgProfil.src = user.photo ? user.photo :  "https://source.unsplash.com/QAB-WJcbgJk/60x60";
+    </script>
+
+    {% comment %} Données de la courbe / TEMPS REEL  {% endcomment %}
+    <script>
+            // Afficher la valeur de la temperature et le PH
+        var tempBox = document.getElementById("tempBox");
+        var phBox = document.getElementById("phBox");
+        
+        var _labels = [];
+        var _data   = [];
+
+        // Area Chart Example
+        var ctx = document.getElementById("myAreaChart");
+        var myLineChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [
+        ],
+            datasets: [{
+            label: "Valeur ",
+            lineTension: 0.3,
+            backgroundColor: "rgba(255, 115, 223, 0.09)",
+            borderColor: "rgba(2, 115, 223, 1)",
+            pointRadius: 3,
+            pointBackgroundColor: "rgba(78, 115, 223, 1)",
+            pointBorderColor: "rgba(78, 115, 223, 1)",
+            pointHoverRadius: 3,
+            pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+            pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+            pointHitRadius: 10,
+            pointBorderWidth: 2,
+            data: [],
+            }],
+        },
+        options: {
+            maintainAspectRatio: false,
+            layout: {
+            padding: {
+                left: 10,
+                right: 25,
+                top: 25,
+                bottom: 0
+            }
+            },
+            scales: {
+            xAxes: [{
+                time: {
+                unit: 'date'
+                },
+                gridLines: {
+                display: false,
+                drawBorder: false
+                },
+                ticks: {
+                maxTicksLimit: 7
+                }
+            }],
+            yAxes: [{
+                ticks: {
+                maxTicksLimit: 5,
+                padding: 10,
+                // Include a dollar sign in the ticks
+                callback: function(value, index, values) {
+                    return  number_format(value) + '°C';
+                }
+                },
+                gridLines: {
+                color: "rgb(234, 236, 244)",
+                zeroLineColor: "rgb(234, 236, 244)",
+                drawBorder: false,
+                borderDash: [2],
+                zeroLineBorderDash: [2]
+                }
+            }],
+            },
+            legend: {
+            display: false
+            },
+            tooltips: {
+            backgroundColor: "rgb(255,255,255)",
+            bodyFontColor: "#858796",
+            titleMarginBottom: 10,
+            titleFontColor: '#6e707e',
+            titleFontSize: 14,
+            borderColor: '#dddfeb',
+            borderWidth: 1,
+            xPadding: 15,
+            yPadding: 15,
+            displayColors: false,
+            intersect: false,
+            mode: 'index',
+            caretPadding: 10,
+            callbacks: {
+                label: function(tooltipItem, chart) {
+                var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
+                return datasetLabel + ': ' + number_format(tooltipItem.yLabel) +  '°C';
+                }
+            }
+            }
+        }
+        });
+        // Ajout des données sur la courbe
+        function updateChart(labels, data) {
+            myLineChart.data.labels = labels;
+            myLineChart.data.datasets.forEach((dataset) => {
+                dataset.data = data;
+            });
+            myLineChart.update();
+        }
+
+        // Recuperation des données sur le serveur
+        var param = ""
+        function onSelectParameterToDisplay() {
+            const site = document.getElementById("site-selected").value;
+            const parameter = document.getElementById("parameter-selected").value;
+            const csrfToken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+            const token = localStorage.getItem('token') ? JSON.parse(localStorage.getItem('token')) : '';
+            param = parameter;
+
+            // Construction de la requete GET et l'url: url/?site=site&?parameter=parameter
+            const url = new URL("{% url 'mainApp:list_water_parameters_user' %}", window.location.origin);
+            url.searchParams.append('site', site);
+            url.searchParams.append('parameter', parameter);
+
+            // Make an AJAX request 
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.setRequestHeader("X-CSRFToken", csrfToken);  // Include CSRF token in headers
+            xhr.setRequestHeader("Authorization", "Bearer_inera " + token.access);  // Include Auth token in headers
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+                    if (xhr.status == 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        const labels = response.labels;
+                        const data   = response.data;
+                        // Avoir accès aux affichés hors de la  fonction
+                        _labels = labels;
+                        _data   = data;
+
+                        if(labels){
+                            switch(param) {
+                                case 'temperature':
+                                    tempBox.innerText = ""+ _data[0] + "°C";
+                                    tempBox.setAttribute('data-text', _data[0]);
+                                    tempBox.dataset.text = _data[0]  + "°C";
+                                    document.querySelector("#idCartMessage").innerText = "Evolution of TEMPERATURE "
+
+                                    phBox.innerText = "Non sélectionné";
+                                    phBox.setAttribute('data-text', "Non sélectionné");
+                                    phBox.dataset.text = _data[0] + "°C";
+                                    break;
+                                case 'ph':
+                                    phBox.innerText = ""+ _data[0] + "°C";
+                                    phBox.setAttribute('data-text', _data[0]);
+                                    phBox.dataset.text = _data[0] + "°C";
+                                    document.querySelector("#idCartMessage").innerText = "Evolution of PH"
+    
+                                    tempBox.innerText = "Non sélectionné";
+                                    tempBox.setAttribute('data-text', "Non sélectionné");
+                                    tempBox.dataset.text = "Non sélectionné";
+    
+                                    break;
+                                case 'od':
+                                    _labels.unshift(response.data.time);
+                                    _data.unshift(response.data.od);
+                                    document.querySelector("#idCartMessage").innerText = "Evolution l'OXYGENE DISSOUS en fonction du temps"
+
+                                    phBox.innerText = "Non sélectionné";
+                                    tempBox.innerText = "Non sélectionné"
+                                    break;
+                                case 'turbidity':
+                                    _labels.unshift(response.data.time);
+                                    _data.unshift(response.data.turbidity);
+                                    document.querySelector("#idCartMessage").innerText = "Evolution LA TURBIDITY en fonction du temps"
+
+                                    phBox.innerText = "Non sélectionné";
+                                    tempBox.innerText = "Non sélectionné"
+                                    break;
+                                default:
+                                    alert("Une erreur c'est produite !!!");
+                            }
+    
+                            updateChart(labels, data);
+                        }
+                        else {
+                            //console.log(tempBox)
+                            tempBox.innerText = "Pas de données";
+                            tempBox.setAttribute('data-text',  "Pas de données");
+                            // Alternatively, you can use the dataset property
+                            tempBox.dataset.text =  "Pas de données";
+
+                            phBox.innerText =  "Pas de données";
+                            phBox.setAttribute('data-text',  "Pas de données");
+                            phBox.dataset.text =  "Pas de données";
+
+                            updateChart([""], [0]);
+                            
+                        }
+                    } else {
+                        alert("Une erreur s'est produite: " + xhr.status);
+                    }
+                    $('#parameterModal').modal('hide');
+                    showWaterQuality();
+                }
+            };
+            xhr.send();
+        }
+
+        // Chargement des données par defaut
+        onSelectParameterToDisplay();
+
+//============ Temps réel: Ouverture du web socket ==============================
+        let origin = window.location.origin;
+        let baseUrl = origin.replace(/^https?:\/\//, '');
+        const socket = new WebSocket('ws://' + baseUrl + '/ws/data/');
+
+        socket.onmessage = function(event) {
+            const response = JSON.parse(event.data);
+            //On supprime le plus vieux 
+            _labels.pop()
+            _data.pop()
+            // Ajout des nouvelles données en temps réel sur le graphe
+            switch(param) {
+                case 'temperature':
+                    _labels.unshift(response.data.time);
+                    _data.unshift(response.data.temperature);
+                    // Box Afficher
+                    tempBox.innerText = ""+ _data[0] + "°C";
+                    tempBox.setAttribute('data-text', _data[0]);
+                    tempBox.dataset.text = _data[0] + "°C";
+
+                    phBox.innerText = "Non sélectionné";
+                    phBox.setAttribute('data-text', "Non sélectionné");
+                    phBox.dataset.text = _data[0] + "°C";
+                    break;
+
+                case 'ph':
+                    _labels.unshift(response.data.time);
+                    _data.unshift(response.data.ph);
+
+                    phBox.innerText = ""+ _data[0] + "°C";
+                    phBox.setAttribute('data-text', _data[0]) + "°C";
+                    phBox.dataset.text = _data[0] + "°C";
+                    
+                    break;
+                case 'od':
+                    _labels.unshift(response.data.time);
+                    _data.unshift(response.data.od);
+                    break;
+                case 'turbidity':
+                    _labels.unshift(response.data.time);
+                    _data.unshift(response.data.turbidity);
+                    break;
+                default:
+                    alert("Une erreur c'est produite !!!");
+            }
+
+            // Update chart with new data
+            updateChart(_labels, _data);
+            showWaterQuality();
+        };
+        socket.onclose = function(event) {
+            alert("Une erreur est survenue !!!");
+            //window.location = window.location.origin
+        };
+
+// Information sur la qualité de l'eau 
+    //showWaterQuality();
+    function showWaterQuality() {
+        // Construct the request URL for getting water parameters
+        const url = new URL("{% url 'mainApp:list_water_parameters_user' %}", window.location.origin);
+        const token = localStorage.getItem('token') ? JSON.parse(localStorage.getItem('token')) : null;
+        const parameter = document.getElementById("parameter-selected").value;
+
+        if (!token) {
+            alert("No authentication token found.");
+            return;
+        }
+
+        url.searchParams.append('parameter', "temperature");
+        url.searchParams.append('site', "Bama");
+
+        // Make an AJAX request to get water parameters
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url, true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.setRequestHeader("Authorization", "Bearer_inera " + token.access);  // Include Auth token in headers
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4) {
+                if (xhr.status == 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    
+                    // Assuming response.data[0] contains the temperature value
+                    var paramForQuality = response.data[0];
+                    if (paramForQuality === null ) 
+                        paramForQuality = 27.0 // lorsque le paramètre n'a pas de valeur
+                    // Construct the request URL for predicting water quality
+                    const url_1 = new URL("{% url 'mainApp:prediction_water_quality' %}", window.location.origin);
+                    url_1.searchParams.append('temperature', paramForQuality);
+
+                    // Make an AJAX request to predict water quality
+                    var xhr1 = new XMLHttpRequest();
+                    xhr1.open("GET", url_1, true);
+                    xhr1.setRequestHeader("Content-Type", "application/json");
+                    xhr1.setRequestHeader("Authorization", "Bearer_inera " + token.access);  // Include Auth token in headers
+
+                    xhr1.onreadystatechange = function () {
+                        if (xhr1.readyState == 4) {
+                            if (xhr1.status == 200) {
+                                const response = JSON.parse(xhr1.responseText);
+
+                                // Get the water quality from the response
+                                const quality = response.quality;
+
+                                // Update the HTML based on the water quality
+                                const chartPieDiv = document.querySelector('.chart-pie');
+                                const smallQualityMessage = document.querySelector(".small-quality-message");
+                                const site = document.getElementById("site-selected").value;
+                                // Pas dynamique
+                                chartPieDiv.innerHTML = '';
+                                smallQualityMessage.innerHTML = '';
+                                if(site ==="Bama"){
+                                    if (quality) {
+                                        chartPieDiv.innerHTML = '<a href="#" class="btn btn-success btn-lg" style="width:10rem; height:10rem; border-radius: 5.3rem;"></a>';
+                                        smallQualityMessage.innerHTML = ' <span class="mr-2"> <i class="fas fa-circle text-success"></i> Qualité de l\'eau favorable </span>';
+    
+                                    } else {
+                                        chartPieDiv.innerHTML = '<a href="#" class="btn btn-danger btn-circle btn-lg" style="width:10rem; height:10rem; border-radius: 5.3rem;"></a>';
+                                        smallQualityMessage.innerHTML = ' <span class="mr-2"> <i class="fas fa-circle text-danger"></i> Qualité de l\'eau non favorable </span>';
+                                    }
+                                }else{
+                                    chartPieDiv.innerHTML = 'Pas de données';
+                                    smallQualityMessage.innerHTML = '';
+                                }
+                            } else {
+                                alert("An error occurred: " + xhr1.status);
+                            }
+                        }
+                    };
+                    xhr1.send();
+                } else {
+                    alert("An error occurred: " + xhr.status);
+                }
+            }
+        };
+        xhr.send();
+    }
+    </script>
+{% endblock %}

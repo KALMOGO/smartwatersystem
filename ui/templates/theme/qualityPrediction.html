@@ -1,0 +1,582 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} quality de l'eau {% endblock %}
+{% block css %}
+<style>
+   #overlay2{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background-color:rgba(0, 255,255,0.2);
+    z-index:99999;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+   }
+   #myoverlay .spinner-border{
+    width:3rem;
+    height:3rem;
+   }
+
+   #notifications {
+    cursor: pointer;
+    position: fixed;
+    right: 0px;
+    z-index: 9999;
+    top: 0px;
+    margin-top: 22px;
+    margin-right: 15px;
+    max-width: 300px;  
+    background-color:green; 
+}
+    
+</style>
+{% endblock %}
+
+{% block container_fluid %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            Détecter la qualité de l'eau
+        </h1>
+        <a href="#" class="d-Aucunes données d-sm-inline-block btn btn-sm btn-primary shadow-sm"
+                data-toggle="modal" data-target="#corrigerQuality">
+            <i class="fa fa-wrench" aria-hidden="true"></i>
+            Corriger une prédiction
+        </a>
+    </div>
+
+    <div class="row">
+        <!-- Earnings (Monthly) Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">TEMPERATURE ACTUELLE DE <span id="selected_site_temp"></span></div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="selected_site_data_temp"></div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fa fa-tint" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Earnings (Monthly) Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">PH ACTUELLE DE <span id="selected_site_ph"></span></div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="selected_site_ph_data"></div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fa fa-tint" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Earnings (Monthly) Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">OD ACTUELLE DE <span id="selected_site_od"></span></div>
+                            <div class="row no-gutters align-items-center">
+                                <div class="col-auto">
+                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800" id="selected_site_od_data"></div>
+                                </div>
+                            
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fa fa-tint" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pending Requests Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">TURBIDITE ACTUELLE DE <span id="selected_site_tubidity"></span></div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="selected_site_tubidity_data"></div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fa fa-tint" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6">
+            <!-- Default Card Example -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    Choix de la source d'eau 
+                </div>
+                <div class="card-body">
+
+                    <form method="POST" onsubmit="onRunPrediction(); return false;">
+                        {% csrf_token %}
+
+                        <div class="form-group">
+                            <label for="site-selected" class="text-50 font-weight-bold">
+                                Choisir le site 
+                            </label>
+                            <select class="form-control form-control-user" id="site-selected" name="site-selected" onchange="retrieveDisplayDataParams()">
+                                <option value="Bama">BAMA</option>
+                                <option value="Matroukou">MATROUKOU</option>
+                                <option value="Nasso">NASSO</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <b> Si Autre source de données au lieu des données collectées </b>
+                            <label for="fileUploadforCorrection" > (CSV ou JSON)</label>
+                            <input type="file" class="form-control form-control-user" id="fileUploadforCorrection" name="fileUploadforCorrection" accept=".csv">
+                        </div>
+
+                        <button class="btn btn-success btn-block" style="font-size:20px" type="submit">
+                            LANCER LA DETECTION
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <!-- Dropdown Card Example -->
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        RESULTAT DE LA VERIFICATION
+                    </h6>
+
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body" id="dotted-card-body" style="
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 10px; /* Adjust padding as needed */
+                height: 100%;
+                ">
+                    <div class="dotted-div" style="
+                    flex: 1; 
+                    border: 2px dotted #CCC;
+                    margin: 10px; 
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    max-width: calc(100% - 20px); 
+                    max-height: calc(100% - 20px); 
+                    border-radius:10px;
+                    padding:20px;
+                    ">
+                        <a id="download" style="display:inline-block; text-align:center; width:100%; height:100%">
+                            <i class="fa fa-download" aria-hidden="true"></i> <u> Télécharger (csv) </u>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <!-- Collapsable Card Example -->
+            <div class="card shadow mb-4">
+                <!-- Card Header - Accordion -->
+                <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+                    <h6 class="m-0 font-weight-bold text-warning" id="qualitymss">
+                        
+                    </h6>
+                </a>
+                <!-- Card Content - Collapse -->
+                <div class="collapse show" id="collapseCardExample" >
+                    <div class="card-body d-flex justify-content-center align-items-center showCard" id="quality-indicate">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="overlay2" style="display:none!important;">
+    <div id="myoverlay" class="d-flex justify-content-center align-items-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only"></span>
+        </div>
+    </div>
+</div>
+<div id="notifications"></div>
+{% endblock %}
+
+{% block js_body %}
+    {% comment %} <script src="{% static 'js/jquery.min.js' %}"></script> {% endcomment %}
+    <script src="{% static 'js/Notify.js' %}"></script>
+
+    {% comment %} Identité de l'utilisateur  {% endcomment %}
+    <script>
+        let user = localStorage.getItem('userConnected') ? JSON.parse(localStorage.getItem('userConnected')) : '';
+        let connected_user = document.getElementById("connected_user");
+        let imgProfil = document.getElementById("img-profile");
+
+        connected_user.innerText = ""+ user.name;
+        imgProfil.src = user.photo ? user.photo :  "https://source.unsplash.com/QAB-WJcbgJk/60x60";
+    </script>
+
+    {% comment %} Voyant pour signaler la qualité de l'eau {% endcomment %}
+    <script >
+        showWaterQuality();
+        function showWaterQuality() {
+            // Construct the request URL for getting water parameters
+            const url = new URL("{% url 'mainApp:list_water_parameters_user' %}", window.location.origin);
+            const token = localStorage.getItem('token') ? JSON.parse(localStorage.getItem('token')) : null;
+    
+            if (!token) {
+                alert("No authentication token found.");
+                return;
+            }
+    
+            url.searchParams.append('parameter', "temperature");
+            url.searchParams.append('site', "Bama");
+    
+            // Make an AJAX request to get water parameters
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.setRequestHeader("Authorization", "Bearer_inera " + token.access);  // Include Auth token in headers
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+                    if (xhr.status == 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        if(response.data){
+                            var temperature = response.data[0]
+
+                        }else{
+                            temperature = 27
+                        }
+
+                        // Construct the request URL for predicting water quality
+                        const url_1 = new URL("{% url 'mainApp:prediction_water_quality' %}", window.location.origin);
+                        url_1.searchParams.append('temperature', temperature);
+    
+                        // Make an AJAX request to predict water quality
+                        var xhr1 = new XMLHttpRequest();
+                        xhr1.open("GET", url_1, true);
+                        xhr1.setRequestHeader("Content-Type", "application/json");
+                        xhr1.setRequestHeader("Authorization", "Bearer_inera " + token.access);  // Include Auth token in headers
+    
+                        xhr1.onreadystatechange = function () {
+                            if (xhr1.readyState == 4) {
+                                if (xhr1.status == 200) {
+                                    const response = JSON.parse(xhr1.responseText);
+    
+                                    // Get the water quality from the response
+                                    const quality = response.quality;
+    
+                                    const chartPieDiv = document.querySelector('.showCard');
+                                    const site = document.getElementById("site-selected").value;
+                                    // Pas dynamique
+                                    chartPieDiv.innerHTML = '';
+
+                                    if(site ==="Bama"){
+                                        if (quality) {
+                                            chartPieDiv.innerHTML = '<a href="#" class="btn btn-circle btn-lg" style="width:5rem; height:5rem; border-radius: 5.3rem;"></a>';
+                                        } else {
+                                            chartPieDiv.innerHTML = '<a href="#" class="btn btn-circle btn-lg" style="width:5rem; height:5rem; border-radius: 5.3rem; background-color:red"></a>';
+                                        }
+                                    }else{
+                                        document.querySelector("#qualitymss").value="QUALITE DE L'EAU DU SITE DE "+site.value
+                                        chartPieDiv.innerHTML = '<span>Pas de données</span>';
+                                    }
+                                } else {
+                                    alert("An error occurred: " + xhr1.status);
+                                }
+                            }
+                        };
+                        xhr1.send();
+                    } else {
+                        alert("An error occurred: " + xhr.status);
+                    }
+                }
+            };
+            xhr.send();
+        }
+        retrieveDisplayDataParams();
+        function retrieveDisplayDataParams(){
+             // Construct the request URL for getting water parameters
+            const url = new URL("{% url 'mainApp:param_water_site_url' %}", window.location.origin);
+            const token = localStorage.getItem('token') ? JSON.parse(localStorage.getItem('token')) : null;
+            const site = document.getElementById("site-selected");
+    
+            if (!token) {
+                    alert("No authentication token found.");
+                    return;
+            }
+
+            url.searchParams.append('site', site.value);
+    
+            // Make an AJAX request to get water parameters
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.setRequestHeader("Authorization", "Bearer_inera " + token.access);  // Include Auth token in headers
+            xhr.onreadystatechange = function () {
+
+                if (xhr.readyState == 4) {
+                    if (xhr.status == 200) {
+                        const response = JSON.parse(xhr.responseText);
+                    ///console.log(response)
+                        // Assuming response.data[0] contains the temperature value
+                        const selected_site_temp = document.getElementById("selected_site_temp");
+                        const selected_site_temp_data = document.getElementById("selected_site_data_temp");
+                        const selected_site_ph = document.getElementById("selected_site_ph");
+
+                        const selected_site_ph_data = document.getElementById("selected_site_ph_data");
+                        const selected_site_tubidity = document.getElementById("selected_site_tubidity");
+                        const selected_site_tubidity_data = document.getElementById("selected_site_tubidity_data");
+
+                        const selected_site_od_data = document.getElementById("selected_site_od_data");
+                        const selected_site_od = document.getElementById("selected_site_od");
+                        selected_site_temp.innerText = site.value;
+                        selected_site_ph.innerText = site.value;
+                        selected_site_tubidity.innerText = site.value;
+                        selected_site_od.innerText = site.value;
+                        document.querySelector("#qualitymss").innerText = "QUALITE DE L'EAU DU SITE DE "+ site.value.toUpperCase();
+
+                            // Update temperature display
+                            if (response.length>0) {
+                                selected_site_temp_data.innerText = response[0].temperature + "°C";
+                                selected_site_ph_data.innerText = response[0].ph + "°C";
+                                selected_site_tubidity_data.innerText = "Pas de données";
+                                selected_site_od_data.innerText = "Pas de données";
+                                showWaterQuality();
+                            } else {
+                                selected_site_temp_data.innerText = "Pas de données";
+                                selected_site_ph_data.innerText = "Pas de données";
+                                selected_site_tubidity_data.innerText = "Pas de données";
+                                selected_site_od_data.innerText = "Pas de données";
+                                document.querySelector('#quality-indicate').innerHTML = "<span>Pas données</span>"
+                                }
+                        } else {
+                            alert("An error occurred: " + xhr.status);
+                        }
+                    }
+                };
+                xhr.send();
+        }
+
+        // Execution d'une prediction
+        function onRunPrediction() {
+            const fileInput = document.getElementById("fileUploadforCorrection");
+            if (fileInput.files.length === 0) {
+                onRunPredictionWithoutFile();
+            }else{
+                const fileType = fileInput.files[0].type;
+                const file     = fileInput.files[0];
+                switch(fileType){
+                    case "text/csv" :
+                    // fonction fléchet pour convertir du csv en json
+                    const CSVToJSON = csv => { 
+                        const lines = csv.split('\n'); 
+                        const keys = lines[0].trim().split(','); 
+                        
+                        const expectedKeys = ['ph', 'temperature', 'oxygen', 'turbidite'];
+                        // Verifier si le fichier fourni est bien
+                        const keysMatch = expectedKeys.every(key => keys.includes(key));
+                        if (!keysMatch) {
+                            return [];
+                        }
+                        return lines.slice(1).map(line => { 
+                            return line.trim().split(',').reduce((acc, cur, i) => { 
+                                const toAdd = {}; 
+                                toAdd[keys[i]] = cur; 
+                                toAdd["site"]  = document.getElementById("site-selected").value;
+                                return { ...acc, ...toAdd }; 
+                            }, {}); 
+                        }); 
+                    }; 
+
+                        // Chargement des données du fichier
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            const jsonDataArray = CSVToJSON(event.target.result);
+
+                            // Verifier le format du fichier
+                            if(jsonDataArray.length==0){
+                                Notify("Fichier csv invalide. Selectionner un fichier avec les colonnes : ph, temperature, oxygen, turbidite " , null, null, 'danger');
+                                $("#overlay2").hide();
+                            }else{
+                                // Si le fichier est bien formaté verifier s'il n'est pas vide
+                                
+                                jsonDataArray.pop(); // remove last data it is bad formatted
+                                onRunPredictionWithFile(jsonDataArray); // effetuer la prediction
+                            }
+                        }
+                        reader.readAsText(file);
+                        break;
+                    case "text/json":
+                        console.log(fileInput)
+                        break;
+                    default:
+                        Notify("Type de fichier non prise en charge", null, null, 'danger');
+                }
+                $("#overlay2").hide();
+            }
+        }
+        
+        function onRunPredictionWithoutFile(){
+            $("#overlay2").show();
+            const url = new URL("{% url 'mainApp:water_quality_csv_url' %}", window.location.origin);
+            const token = localStorage.getItem('token') ? JSON.parse(localStorage.getItem('token')) : null;
+            const csrfToken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+            const site = document.getElementById("site-selected").value;
+            const download = document.querySelector("#download");
+        
+            if (!token) {
+                alert("No authentication token found.");
+                return;
+            }
+        
+            url.searchParams.append('site', site);
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", url, true);
+            xhr.setRequestHeader("X-CSRFToken", csrfToken);  // Include CSRF token in headers
+            xhr.setRequestHeader("Authorization", "Bearer_inera " + token.access);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+                    if (xhr.status == 200) {
+                        const blob = new Blob([xhr.responseText], { type: 'text/csv' });
+                        const url = window.URL.createObjectURL(blob);
+                        download.href = url;
+                        setTimeout(()=>{
+                            $("#overlay2").hide();
+                            download.download = "qualite_predicte.csv";
+                            download.click();
+                        }, 2000);
+                        setTimeout(()=>{
+                            Notify("Prediction terminée !!! ",null,null,'success');
+                        }, 5000);
+                    } else {
+                        Notify(" Erreur:" + xhr.status,null,null,'danger');
+                        $("#overlay2").hide();
+                    }
+                }
+            };
+            xhr.send();
+        }
+
+        function onRunPredictionWithFile(jsonDataArray){
+            $("#overlay2").show();
+            const url = new URL("{% url 'mainApp:water_quality_pred_with_file_url' %}", window.location.origin);
+            const token = localStorage.getItem('token') ? JSON.parse(localStorage.getItem('token')) : null;
+            const csrfToken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+            const download = document.querySelector("#download");
+
+            if (!token) {
+                alert("No authentication token found.");
+                $("#overlay2").hide();
+                return;
+            }
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.setRequestHeader("X-CSRFToken", csrfToken);  // Include CSRF token in headers
+            xhr.setRequestHeader("Authorization", "Bearer_inera " + token.access);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+                    const blob = new Blob([xhr.responseText], { type: 'text/csv' });
+                        const url = window.URL.createObjectURL(blob);
+                        download.href = url;
+                        setTimeout(()=>{
+                            $("#overlay2").hide();
+                            download.download = "qualite_predicte_resultat.csv";
+                            download.click();
+                        }, 2000);
+                        setTimeout(()=>{
+                            Notify("Prediction terminée !!! ",null,null,'success');
+                        }, 5000);
+                }
+            };
+            xhr.send(JSON.stringify(jsonDataArray));
+        }
+
+        $(document).ready(function(){
+            $("#overlay2").hide();
+        });
+    </script>
+
+    {% comment %} Correction des prédictions {% endcomment %}
+    <script>
+        //onCorrectParameterToDisplay();
+        function onCorrectParameterToDisplay() {
+            
+            const data = {
+                id: document.getElementById("idPredictionCorrection").value,
+                quality: document.getElementById("parameter-correction-selected").value
+            };
+
+            const csrfToken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+            const token = localStorage.getItem('token') ? JSON.parse(localStorage.getItem('token')) : '';
+            
+            // Construct the request URL
+            const url = new URL("{% url 'mainApp:water_quality_correction_url' %}", window.location.origin);
+        
+            // Make an AJAX request
+            var xhr = new XMLHttpRequest();
+            xhr.open("PUT", url, true); // Use PUT for update
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.setRequestHeader("X-CSRFToken", csrfToken); // Include CSRF token in headers
+            xhr.setRequestHeader("Authorization", "Bearer_inera " + token.access); // Include Auth token in headers
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+                    if (xhr.status == 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        Notify(" Corriger avec success !!!", null, null, 'success');
+                    } else {
+                        if(xhr.status == 404){
+                            Notify("Erreur: Objet inexistant !!! ", null, null, 'danger');
+                        }else{
+                            Notify("Erreur: Une erreur c'est produite ", null, null, 'danger');
+                        }
+                    }
+                }
+                document.getElementById("idPredictionCorrection").value = "";
+                $('#corrigerQuality').modal('hide');
+                
+            };
+            xhr.send(JSON.stringify(data));
+        }
+        
+        $(document).ready(function(){
+            $("#corrigerQuality").hide();
+        });
+    </script>
+    {% comment %} Loading spinner {% endcomment %}
+{% endblock %}

@@ -35,6 +35,10 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # Application definition
 
 INSTALLED_APPS = [
+    #Web socket
+    "daphne",
+    "channels",
+    #Default django
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -45,11 +49,14 @@ INSTALLED_APPS = [
     # rest framework
     'corsheaders',
     'rest_framework',
+    "rest_framework_api_key",
     "rest_framework.authtoken",
-    'django_filters',
-
+    
     # Externals App
-    "mainApp"
+    "mainApp",
+    "account",
+        # User apps
+    "users.apps.UsersConfig",
 ]
 
 MIDDLEWARE = [
@@ -69,7 +76,7 @@ ROOT_URLCONF = "smartwatersystemApi.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, "ui", "templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -82,9 +89,14 @@ TEMPLATES = [
     },
 ]
 
+# ASGI application: Http request
 WSGI_APPLICATION = "smartwatersystemApi.wsgi.application"
 
+# ASGI application: WebSockets
+ASGI_APPLICATION = 'smartwatersystemApi.asgi.application'
 
+# Utiliser la table User account comme table pour s'auth
+AUTH_USER_MODEL  = 'account.User'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
@@ -127,28 +139,38 @@ USE_I18N = True
 USE_TZ = True
 
 
-REST_FRAMEWORK = {
+REST_FRAMEWORK = { 
     'DEFAULT_AUTHENTICATION_CLASSES':[
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
+
+    ], 'DEFAULT_PERMISSION_CLASSES': [
+        #"rest_framework_api_key.permissions.HasAPIKey",
+        #'rest_framework.permissions.IsAdminUser',
     ],
     
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 20
+    'PAGE_SIZE': 150
 }
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = "static/"
-STATICFILES_DIRS = [BASE_DIR/"static"]
-STATIC_ROOT = BASE_DIR / "staticfiles" 
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static') 
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/2.2/howto/static-files/
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "ui", "static", "root")
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "ui", "static", "files", "theme"),
+    os.path.join(BASE_DIR, "ui", "static", "files", "app"),
+)
+
+# Media files
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "ui", "media", "uploads")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -163,15 +185,15 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # 
-
+ALLOWED_HOSTS =['*']
 # Use environment variables for your sensitive settings
 SECRET_KEY = env("SECRET_KEY")  
 
 DEBUG = env.bool('DEBUG', default=False)
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost','127.0.0.1'])
+# ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost','127.0.0.1'])
 
-if not DEBUG and not ALLOWED_HOSTS:
-    raise ImproperlyConfigured("You must set ALLOWED_HOSTS if DEBUG is False")
+# if not DEBUG and not ALLOWED_HOSTS:
+#     raise ImproperlyConfigured("You must set ALLOWED_HOSTS if DEBUG is False")
 
 # SIMPLE_JWT configuration
 SIMPLE_JWT = {
@@ -179,4 +201,33 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=int(env('REFRESH_TOKEN_LIFETIME_DAYS', default=13))),
     'SIGNING_KEY': env('SIGNING_KEY', default=SECRET_KEY),
     'AUTH_HEADER_TYPES': env.list('AUTH_HEADER_TYPES', default=["Bearer"]),
+}
+
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'file': {
+#             'level': 'DEBUG',
+#             'class': 'logging.FileHandler',
+#             'filename': 'debug.log',
+#         },
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['file'],
+#             'level': 'DEBUG',
+#             'propagate': True,
+#         },
+#     },
+# }
+
+# Reggis pour le Websocket
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
 }

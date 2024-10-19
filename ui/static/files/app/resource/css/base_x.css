@@ -1,0 +1,46 @@
+/*html {
+  height: 100vh;
+}
+*/
+body {
+	/* Background image */
+	background-image: linear-gradient(180deg,#edeff5 10%,#99dec1 100%);
+	/* min-height: 100vh; */
+}
+
+.bg-white {
+    background-color: #1a1b1a!important;
+	
+}
+
+#login-container{
+	background-image: url("../img/water.jpg");
+}
+
+#site-logo-x {
+	width: 200px;height: auto;
+}
+
+.active-nav-link-x {
+	background-color: gray;
+}
+
+#dotted-card-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px; /* Adjust padding as needed */
+    height: 100%; /* Ensure the card body takes the full height of its container */
+}
+
+.dotted-div {
+    flex: 1; /* Allow the div to grow to fill the available space */
+    border: 1px dotted #CCC;
+    margin: 10px; /* Adjust margin as needed */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: calc(100% - 20px); /* Adjust the width to account for margin */
+    max-height: calc(100% - 20px); /* Adjust the height to account for margin */
+	background-color: red;
+}
